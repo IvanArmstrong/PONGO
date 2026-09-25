@@ -16,42 +16,6 @@ import java.util.List;
 
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.JComponent;
-import javax.imageio.ImageIO;
-import java.io.File;
-
-class Nungus extends JComponent {
-    @Override
-    public void paint(Graphics g) {
-        super.paint(g);
-
-        g.setColor(Color.BLUE);
-        g.fillRect(0, 0, 400, 24);
-        g.setColor(Color.RED);
-        g.drawString("PONGOPONGOPONGOPONGOPONGOPONGOPONGOPONGOPONGOPONGO", 0, 16);
-    }
-
-    @Override
-    public int getWidth() {
-        return 400;
-    }
-
-    @Override
-    public int getHeight() {
-        return 24;
-    }
-
-    protected void paintComponent(Graphics g) {
-        // Call paintComponent from parent class
-        super.paintComponent(g);
-
-        // Draw a square
-        g.setColor(Color.RED);
-        g.fillRect(0, 0, 50, 50);
-        g.setColor(Color.BLACK);
-        g.drawString("Square", 0, 0);
-    }
-}
 
 class TestAction extends AbstractAction {
     private final Logger logger;
@@ -73,30 +37,6 @@ class TestAction extends AbstractAction {
     }
 }
 
-class PongoIcon implements Icon {
-//    final Image image = new File("C:/Users/IvanArmstrong/Pictures/monke.png")
-    PongoIcon() {
-        super();
-    }
-    @Override
-    public void paintIcon(Component c, Graphics g, int x, int y) {
-//        g.setColor(Color.BLUE);
-//        g.fillRect(0, 0, 80, 24);
-//        g.setColor(Color.RED);
-//        g.drawString("PONGO", 0, 16);
-    }
-
-    @Override
-    public int getIconWidth() {
-        return 80;
-    }
-
-    @Override
-    public int getIconHeight() {
-        return 16;
-    }
-}
-
 /**
  * This is the Designer-scope module hook.  The minimal implementation contains a startup method.
  */
@@ -105,6 +45,8 @@ public class ExperimentationDesignerHook extends AbstractDesignerModuleHook {
     // override additonal methods as requried
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private DesignerContext context;
+
+    private DoomHud hud;
 
     @Override
     public List<CommandBar> getModuleToolbars() {
@@ -124,10 +66,23 @@ public class ExperimentationDesignerHook extends AbstractDesignerModuleHook {
     @Override
     public void startup(DesignerContext context, LicenseState activationState) throws Exception {
         this.context = context;
+        logger.info("Experimentation Module Initializing");
 
-        logger.info("AAAAAAAAAAA IT BURNS AAAAAAAAAAAAA");
+        // Set up status bar
         StatusBar bar = context.getStatusBar();
-        bar.setMessage("AAAAAAAAAAA IT BURNS AAAAAAAAAAAAA");
-        bar.addDisplay(new Nungus(), 0);
+        bar.setPreferredSize(new Dimension(1920, 173));
+
+        // Initialize hud
+        hud = new DoomHud(logger);
+        bar.addDisplay(hud, 0);
+
+        // Add hud as a mouse motion event listener
+        Toolkit tk = Toolkit.getDefaultToolkit();
+        tk.addAWTEventListener(hud, AWTEvent.MOUSE_MOTION_EVENT_MASK);
+    }
+
+    @Override
+    public void shutdown() {
+        Toolkit.getDefaultToolkit().removeAWTEventListener(hud);
     }
 }
